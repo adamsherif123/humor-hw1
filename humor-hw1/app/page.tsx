@@ -16,6 +16,12 @@ export default function Home() {
         >
           Go to list
         </Link>
+        <Link
+          href="/upload"
+          className="mt-3 inline-flex items-center justify-center rounded-lg border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 px-6 py-3 text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
+        >
+          Upload image (HW5)
+        </Link>
       </main>
     </div>
   )

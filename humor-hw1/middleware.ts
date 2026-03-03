@@ -21,18 +21,18 @@ export async function middleware(request: NextRequest) {
     },
   })
 
-  // Refresh session / read user (important for SSR auth)
   const { data } = await supabase.auth.getUser()
   const user = data.user
 
-  const isProtectedRoute = request.nextUrl.pathname.startsWith("/list")
-  const isLoginRoute = request.nextUrl.pathname.startsWith("/login")
-  const isCallbackRoute = request.nextUrl.pathname.startsWith("/auth/callback")
+  const pathname = request.nextUrl.pathname
+  const isProtectedRoute = pathname.startsWith("/list") || pathname.startsWith("/upload")
+  const isLoginRoute = pathname.startsWith("/login")
+  const isCallbackRoute = pathname.startsWith("/auth/callback")
 
   if (isProtectedRoute && !user && !isLoginRoute && !isCallbackRoute) {
     const redirectUrl = request.nextUrl.clone()
     redirectUrl.pathname = "/login"
-    redirectUrl.search = "" // keep it clean
+    redirectUrl.search = ""
     return NextResponse.redirect(redirectUrl)
   }
 
@@ -40,5 +40,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/list/:path*", "/auth/callback", "/login"],
+  matcher: ["/list/:path*", "/upload/:path*", "/auth/callback", "/login"],
 }
