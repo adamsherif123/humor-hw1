@@ -1,12 +1,12 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
+import { useState } from "react"
 
 type CaptionRecord = {
   id?: string
   content?: string
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export default function UploadPage() {
@@ -41,72 +41,73 @@ export default function UploadPage() {
 
       setCdnUrl(json.cdnUrl ?? "")
       setCaptions(Array.isArray(json.captions) ? json.captions : [])
-    } catch (e: any) {
-      setError(e?.message ?? "Unknown error")
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        setError(e.message)
+      } else {
+        setError("Unknown error")
+      }
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <main style={{ padding: 24, maxWidth: 900, margin: "0 auto" }}>
+    <main className="mx-auto w-full max-w-4xl px-6 py-8">
       <Link
         href="/"
-        className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 mb-6"
+        className="mb-6 inline-flex items-center gap-1.5 text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
       >
         ← Back
       </Link>
 
-      <h1 style={{ fontSize: 28, fontWeight: 700 }}>Upload Image → Generate Captions</h1>
-      <p style={{ marginTop: 8, opacity: 0.8 }}>
-        This uses the staging pipeline API and requires login.
-      </p>
+      <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <h1 className="text-3xl font-semibold tracking-tight">Upload image and generate captions</h1>
+        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
+          Step 1: choose an image file. Step 2: click Generate captions.
+        </p>
 
-      <div style={{ marginTop: 16, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-        <input
-          type="file"
-          accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/heic"
-          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-        />
-        <button
-          onClick={onSubmit}
-          disabled={loading || !file}
-          style={{
-            padding: "10px 14px",
-            borderRadius: 10,
-            border: "1px solid #ddd",
-            cursor: "pointer",
-            fontWeight: 600,
-          }}
-        >
-          {loading ? "Working..." : "Generate Captions"}
-        </button>
-      </div>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <input
+            type="file"
+            accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/heic"
+            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            className="max-w-full text-sm"
+          />
+          <button
+            onClick={onSubmit}
+            disabled={loading || !file}
+            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:hover:bg-zinc-800"
+          >
+            {loading ? "Working..." : "Generate captions"}
+          </button>
+        </div>
 
-      {error ? <p style={{ marginTop: 12, color: "crimson" }}>{error}</p> : null}
+        {error ? <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p> : null}
+      </section>
 
       {cdnUrl ? (
-        <div style={{ marginTop: 18 }}>
-          <p style={{ opacity: 0.8 }}>Uploaded image:</p>
+        <section className="mt-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+          <h2 className="text-lg font-medium">Uploaded image</h2>
           <img
             src={cdnUrl}
             alt="uploaded"
-            style={{ maxWidth: "100%", borderRadius: 12, border: "1px solid #ddd" }}
+            className="mt-3 max-w-full rounded-xl border border-zinc-200 dark:border-zinc-700"
           />
-        </div>
+        </section>
       ) : null}
 
       {captions.length ? (
-        <div style={{ marginTop: 18 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 700 }}>Generated Captions</h2>
-          <div style={{ marginTop: 10, display: "grid", gap: 10 }}>
+        <section className="mt-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+          <h2 className="text-lg font-medium">Generated captions</h2>
+          <div className="mt-3 grid gap-2">
             {captions.map((c, idx) => (
-              <div key={c.id ?? idx} style={{ border: "1px solid #ddd", borderRadius: 12, padding: 12 }}>
-                <div style={{ fontSize: 16 }}>{c.content ?? JSON.stringify(c)}</div>
+              <div key={c.id ?? idx} className="rounded-lg border border-zinc-200 p-3 dark:border-zinc-700">
+                <p className="text-sm text-zinc-900 dark:text-zinc-100">{c.content ?? JSON.stringify(c)}</p>
               </div>
             ))}
           </div>
-        </div>
+        </section>
       ) : null}
     </main>
   )

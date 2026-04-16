@@ -1,0 +1,46 @@
+HW10 UI Improvements (Feedback-Driven)
+
+Why these changes were made:
+- Users hesitated at the start and were unsure what to click first.
+- Users wanted clearer guidance and action hierarchy.
+- Some important actions were easy to miss.
+
+What changed:
+
+1) Home page onboarding and action clarity (app/page.tsx)
+- Replaced the minimal landing view with a guided hero card.
+- Added explicit onboarding copy: new users are told to open the list and vote.
+- Renamed primary CTA to "Start rating captions" to make the first action obvious.
+- Kept upload as a secondary CTA with clearer label: "Upload image and generate captions".
+- Added a visible 3-step flow row:
+  1) Open list
+  2) Pick a caption
+  3) Submit your vote
+
+2) Captions list usability and hierarchy (app/list/page.tsx)
+- Reworked page into card-based layout for clearer visual structure.
+- Added instruction text at top: users vote once and caption disappears afterward.
+- Improved authenticated error/not-logged-in states with consistent styling.
+- Added explicit empty state when user has already voted on all visible captions:
+  "You are done for now..."
+- Preserved behavior that filters out captions already voted by current user.
+
+3) Upload flow clarity (app/upload/page.tsx)
+- Added step-by-step instruction text:
+  "Step 1: choose an image file. Step 2: click Generate captions."
+- Improved spacing and card hierarchy for file picker, image preview, and generated captions.
+- Kept feedback states visible (loading, error, results) with clearer visual grouping.
+
+4) Consistency improvements
+- Unified back navigation style and spacing across pages.
+- Unified typography, card borders, and neutral color hierarchy for readability.
+
+How these changes map to feedback:
+- "I don't know what I'm supposed to click first" -> explicit primary CTA + step guide.
+- "What does this do?" -> clearer button labels and directional helper text.
+- Features overlooked -> stronger visual hierarchy and sectioned card layout.
+
+Outcome expected:
+- Faster first action by new users.
+- Less confusion about app flow.
+- More discoverable key features without adding unrelated functionality.
