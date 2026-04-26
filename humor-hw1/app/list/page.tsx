@@ -10,6 +10,28 @@ type CaptionRow = {
   image_id?: string | null
 }
 
+type ImageRow = {
+  id: string
+  [key: string]: unknown
+}
+
+function resolveImageUrl(image: ImageRow | undefined): string | null {
+  if (!image) return null
+  const candidates = [
+    image.url,
+    image.cdn_url,
+    image.image_url,
+    image.image_path,
+    image.path,
+  ]
+  for (const value of candidates) {
+    if (typeof value === "string" && value.length > 0) {
+      return value
+    }
+  }
+  return null
+}
+
 export default async function ListPage() {
   const supabase = await createSupabaseServerClient()
 
@@ -63,6 +85,14 @@ export default async function ListPage() {
 
   const allRows = (data ?? []) as CaptionRow[]
   const rows = allRows.filter((row) => !votedCaptionIds.has(row.id))
+  const imageIds = rows
+    .map((row) => row.image_id)
+    .filter((id): id is string => typeof id === "string" && id.length > 0)
+
+  const { data: imageData } = imageIds.length
+    ? await supabase.from("images").select("*").in("id", imageIds)
+    : { data: [] as ImageRow[] }
+  const imageById = new Map((imageData ?? []).map((image) => [image.id, image as ImageRow]))
 
   return (
     <main className="mx-auto w-full max-w-4xl px-6 py-8">
@@ -95,9 +125,27 @@ export default async function ListPage() {
               key={row.id}
               className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
             >
-              <p className="text-base leading-7 text-zinc-900 dark:text-zinc-100">
-                {row.content ?? <span className="text-zinc-500">(no content)</span>}
-              </p>
+              <div className="grid gap-3 md:grid-cols-[180px_1fr] md:items-start">
+                {(() => {
+                  const imageUrl = row.image_id
+                    ? resolveImageUrl(imageById.get(row.image_id))
+                    : null
+                  return imageUrl ? (
+                    <img
+                      src={imageUrl}
+                      alt="Caption image"
+                      className="h-32 w-full rounded-lg border border-zinc-200 object-cover dark:border-zinc-700 md:h-28"
+                    />
+                  ) : (
+                    <div className="flex h-32 items-center justify-center rounded-lg border border-dashed border-zinc-300 bg-zinc-50 text-xs text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 md:h-28">
+                      No image available
+                    </div>
+                  )
+                })()}
+                <p className="text-base leading-7 text-zinc-900 dark:text-zinc-100">
+                  {row.content ?? <span className="text-zinc-500">(no content)</span>}
+                </p>
+              </div>
               <VoteButtons captionId={row.id} />
             </article>
           ))}
